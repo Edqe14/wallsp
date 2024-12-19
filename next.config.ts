@@ -1,7 +1,14 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'raw.githubusercontent.com',
+      },
+    ],
+    minimumCacheTTL: 31_536_000, // 1 year
+  },
 };
 
 export default nextConfig;

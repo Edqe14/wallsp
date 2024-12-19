@@ -1,101 +1,190 @@
-import Image from "next/image";
+'use client';
+
+import { Badge } from '@/components/ui/badge';
+import { Download } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import { MultiSelect } from '@/components/ui/multi-select';
+import SOURCES from '@/lib/sources.json';
+import { bytesToSize, capitalize } from '@/lib/utils';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import Image from 'next/image';
+import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [sources, setSources] = useState<string[]>(
+    SOURCES.map((source) => source.repo)
+  );
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const [tags, setTags] = useState(
+    SOURCES.flatMap((source) => (source.root ? [] : source.collections))
+  );
+
+  const images = useMemo(() => {
+    return (
+      SOURCES
+        //filter source repo
+        .filter((source) => sources.includes(source.repo))
+        .flatMap((source) =>
+          source.collections
+            // filter tag collection
+            .filter((col) => tags.includes(col))
+            .flatMap((cols) =>
+              source.images[cols as keyof typeof source.images]?.flatMap(
+                (img) => (
+                  <Dialog key={img.url}>
+                    <DialogTrigger>
+                      <picture className="backdrop-blur-sm cursor-pointer overflow-hidden h-full hover:z-10 relative grid place-items-center transition-all rounded duration-300 ease-in-out group hover:rounded-md hover:scale-105 lg:hover:scale-110 hover:opacity-[100_!important] group-hover:opacity-40">
+                        <div className="absolute inset-0 px-1 py-1 z-[5] transition-all duration-300 ease-out blur-md opacity-0 hover:blur-0 hover:opacity-100">
+                          <div className="flex gap-1">
+                            <Badge
+                              variant="secondary"
+                              className="border border-zinc-700"
+                            >
+                              {source.repo}
+                            </Badge>
+
+                            <Badge
+                              variant="secondary"
+                              className="border border-zinc-700"
+                            >
+                              {bytesToSize(img.size)}
+                            </Badge>
+
+                            {!source.root && (
+                              <Badge
+                                variant="secondary"
+                                className="border border-zinc-700 capitalize"
+                              >
+                                {cols}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        <Image
+                          src={img.download_url}
+                          width={640}
+                          height={0}
+                          alt={img.name}
+                          className="w-full h-full object-cover"
+                          loader={({ src }) =>
+                            `/api/preview?url=${encodeURIComponent(src)}`
+                          }
+                          draggable={false}
+                        />
+                      </picture>
+                    </DialogTrigger>
+
+                    <DialogContent
+                      className="overflow-hidden p-0 gap-0"
+                      closeClassName="bg-secondary border border-secondary"
+                    >
+                      <DialogHeader>
+                        <Image
+                          src={img.download_url}
+                          width={640}
+                          height={0}
+                          alt={img.name}
+                          className="w-full"
+                          draggable={false}
+                          loader={({ src }) =>
+                            `/api/preview?url=${encodeURIComponent(src)}`
+                          }
+                        />
+                      </DialogHeader>
+
+                      <DialogDescription className="p-3">
+                        <section className="flex justify-between items-start">
+                          <div className="flex gap-1">
+                            <Badge
+                              variant="secondary"
+                              className="border border-zinc-700"
+                            >
+                              {source.repo}
+                            </Badge>
+
+                            <Badge
+                              variant="secondary"
+                              className="border border-zinc-700"
+                            >
+                              {bytesToSize(img.size)}
+                            </Badge>
+                          </div>
+
+                          <div>
+                            <a href={img.download_url} download={img.name}>
+                              <Button>
+                                <Download /> Download
+                              </Button>
+                            </a>
+                          </div>
+                        </section>
+                      </DialogDescription>
+                    </DialogContent>
+                  </Dialog>
+                )
+              )
+            )
+        )
+    );
+  }, [sources, tags]);
+
+  return (
+    <main className="min-h-[100svh] flex justify-center px-8">
+      <section className="max-w-screen-lg flex-grow pb-8">
+        <nav className="flex justify-between py-4 px-4 sticky top-0 z-20">
+          <p className="font-bold text-lg bg-primary text-secondary h-min px-1">
+            Wallpapers
+          </p>
+
+          <div className="flex gap-1">
+            <MultiSelect
+              label={
+                <>
+                  Tags{' '}
+                  <Badge variant="secondary" className="px-1">
+                    {tags.length}
+                  </Badge>
+                </>
+              }
+              options={SOURCES.flatMap((source) =>
+                source.root ? [] : source.collections
+              ).map((source) => ({
+                label: capitalize(source),
+                value: source
+              }))}
+              defaultValue={tags}
+              onValueChange={setTags}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+            <MultiSelect
+              label={
+                <>
+                  Source{' '}
+                  <Badge variant="secondary" className="px-1">
+                    {sources.length}
+                  </Badge>
+                </>
+              }
+              options={SOURCES.map((source) => ({
+                label: source.repo,
+                value: source.repo
+              }))}
+              defaultValue={sources}
+              onValueChange={setSources}
+            />
+          </div>
+        </nav>
+
+        <section className="grid md:grid-cols-2 lg:grid-cols-3 group gap-1">
+          {images}
+        </section>
+      </section>
+    </main>
   );
 }
