@@ -1,23 +1,7 @@
 import { sources } from '@/sources';
 import path from 'node:path/posix';
 import fs from 'node:fs/promises';
-
-type GithubContentResponse = {
-  name: string;
-  path: string;
-  sha: string;
-  size: number;
-  url: string;
-  html_url: string;
-  git_url: string;
-  download_url: string | null;
-  type: 'dir' | 'file';
-  _links: {
-    self: string;
-    git: string;
-    html: string;
-  };
-};
+import type { GithubContentResponse } from '@/lib/types';
 
 const imageFileRegex = /\.(jpe?g|png|gif|webp)$/i;
 const getContentsUrl = (repo: string, path = '') =>

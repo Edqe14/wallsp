@@ -1,3 +1,4 @@
+import { DialogProvider } from '@/components/dialog-provider';
 import './globals.css';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
@@ -28,6 +29,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <DialogProvider />
       </body>
     </html>
   );
