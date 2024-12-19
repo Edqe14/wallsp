@@ -74,7 +74,7 @@ export default function Home() {
                           alt={img.name}
                           className="w-full h-full object-cover"
                           loader={({ src, width, quality }) =>
-                            `https://img.toritori.shop/?url=${encodeURIComponent(src)}&maxage=31536000&output=webp&w=${width}&q=${quality || 70}`
+                            `https://img.toritori.shop/pr:sharp/rs:auto:${width}/f:webp/q:${quality || 70}/plain/${encodeURIComponent(src)}`
                           }
                           draggable={false}
                         />
@@ -94,7 +94,7 @@ export default function Home() {
                           className="w-full"
                           draggable={false}
                           loader={({ src, width, quality }) =>
-                            `https://img.toritori.shop/?url=${encodeURIComponent(src)}&maxage=31536000&output=webp&w=${width}&q=${quality || 70}`
+                            `https://img.toritori.shop/pr:sharp/rs:auto:${width}/f:webp/q:${quality || 70}/plain/${encodeURIComponent(src)}`
                           }
                         />
                       </DialogHeader>
