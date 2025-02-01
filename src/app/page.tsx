@@ -104,7 +104,7 @@ export default function Home() {
                       alt={img.name}
                       className="w-full h-full object-cover z-[1]"
                       loader={({ src, width, quality }) =>
-                        `https://img.toritori.shop/pr:sharp/rs:auto:${width}/f:webp/q:${quality || 70}/plain/${encodeURIComponent(src)}`
+                        `https://fio.edqe.me/o?src=${encodeURIComponent(src)}&w=${width}&format=webp&q=${quality || 70}`
                       }
                       draggable={false}
                     />
