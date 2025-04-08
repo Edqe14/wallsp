@@ -91,7 +91,7 @@ export const DialogProvider = () => {
               className="w-full h-full object-contain z-[1]"
               draggable={false}
               loader={({ src, width, quality }) =>
-                `https://img.toritori.shop/pr:sharp/rs:auto:${width}/f:webp/q:${quality || 70}/plain/${encodeURIComponent(src)}`
+                `https://fio.edqe.me/o?src=${encodeURIComponent(src)}&w=${width}&format=webp&q=${quality || 70}`
               }
             />
           </DialogHeader>
