@@ -37,8 +37,6 @@ export default function Home() {
     };
   }, []);
 
-  console.log(tags);
-
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const images = useMemo(() => {
     return (
