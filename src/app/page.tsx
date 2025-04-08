@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { MultiSelect } from '@/components/ui/multi-select';
 import SOURCES from '@/lib/sources.json';
-import { bytesToSize, capitalize } from '@/lib/utils';
+import { bytesToSize, capitalize, formatNumber } from '@/lib/utils';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,6 +18,16 @@ export default function Home() {
   );
   const [tags, setTags] = useState(
     SOURCES.flatMap((source) => (source.root ? [] : source.collections))
+  );
+  const allTagsLength = useMemo(
+    () =>
+      SOURCES.flatMap((source) => (source.root ? [] : source.collections))
+        .length,
+    []
+  );
+  const isAllTags = useMemo(
+    () => tags.length === allTagsLength,
+    [tags, allTagsLength]
   );
 
   useEffect(() => {
@@ -46,7 +56,11 @@ export default function Home() {
         .flatMap((source) =>
           source.collections
             // filter tag collection
-            .filter((col) => (source.root ? tags.includes(col) : true))
+            .filter((col) => {
+              if (isAllTags) return true;
+
+              return tags.includes(col);
+            })
             .flatMap((cols) =>
               source.images[cols as keyof typeof source.images]?.flatMap(
                 (img) => (
@@ -119,12 +133,16 @@ export default function Home() {
   return (
     <main className="min-h-[100svh] flex justify-center px-8">
       <section className="max-w-screen-lg flex-grow pb-8">
-        <nav className="flex justify-between py-4 px-4 sticky top-0 z-20">
+        <nav className="flex justify-between py-4 px-4 sticky items-center top-0 z-20">
           <p className="font-bold text-lg bg-primary text-secondary h-min px-1 tracking-tighter">
             WALLSP
           </p>
 
-          <div className="flex gap-1">
+          <p className="text-sm text-secondary-foreground bg-primary-foreground absolute left-1/2 -translate-x-1/2 px-1 tracking-tighter">
+            Showing {formatNumber(images.length)} images
+          </p>
+
+          <div className="flex gap-1 items-center">
             <MultiSelect
               label={
                 <>
