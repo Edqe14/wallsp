@@ -37,6 +37,8 @@ export default function Home() {
     };
   }, []);
 
+  console.log(tags);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const images = useMemo(() => {
     return (
@@ -46,7 +48,7 @@ export default function Home() {
         .flatMap((source) =>
           source.collections
             // filter tag collection
-            .filter((col) => (!source.root ? tags.includes(col) : true))
+            .filter((col) => (source.root ? tags.includes(col) : true))
             .flatMap((cols) =>
               source.images[cols as keyof typeof source.images]?.flatMap(
                 (img) => (
